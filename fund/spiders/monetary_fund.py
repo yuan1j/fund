@@ -41,14 +41,15 @@ class MonetaryFundSpider(scrapy.Spider):
             yield scrapy.Request(url_detail, callback=self.parse_detail, meta={"item": item})
 
         # 构造下一页url
-        # if response.xpath('//div[@id="pagebar"]/label[last()]/@class').extract_first() != "end":
-        #     next_url = response.xpath('//div[@id="pagebar"]/label[last()]/text()').extract_first()
-        #     yield scrapy.Request(next_url)
-
+        if response.xpath('//div[@id="pagebar"]/label[last()]/@class').extract_first() != "end":
+            yield scrapy.Request(self.start_urls[0] + "text", callback=self.parse)
 
     def parse_detail(self, response):
         item = response.meta["item"]
-        item["fund_size"] = response.xpath('//div[@class="infoOfFund"]/table/tr[1]/td[2]/a/text()').extract_first()
-        item["fund_manager"] = response.xpath('//div[@class="infoOfFund"]/table/tr[1]/td[3]/a/text()').extract_first()
-        item["fund_company"] = response.xpath('//div[@class="infoOfFund"]/table/tr[2]/td[2]/a/text()').extract_first()
+        item["fund_size"] = response.xpath(
+            '//div[@class="infoOfFund"]/table/tbody/tr[1]/td[2]/a/text()').extract_first()
+        item["fund_manager"] = response.xpath(
+            '//div[@class="infoOfFund"]/table/tbody/tr[1]/td[3]/a/text()').extract_first()
+        item["fund_company"] = response.xpath(
+            '//div[@class="infoOfFund"]/table/tbody/tr[2]/td[2]/a/text()').extract_first()
         yield item
